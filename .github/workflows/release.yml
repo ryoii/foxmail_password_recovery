@@ -30,9 +30,6 @@ jobs:
           CGO_ENABLED=0 GOOS=windows GOARCH=amd64 \
           go build -ldflags="-s -w" -o build/FPR-${{ steps.tag.outputs.tag }}.exe ./main
 
-      - name: Chmod for application
-        run: chmod u+x build/FPR-v${{ steps.tag.outputs.tag }}.exe
-
       - name: Create Release
         id: create-release
         uses: actions/create-release@v1
