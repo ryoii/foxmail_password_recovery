@@ -1,0 +1,55 @@
+name: Release
+
+on:
+  push:
+    tags: [ 'v*' ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Go 1.15
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.15
+
+      - name: Download Go Dependencies
+        run: go mod download
+
+      - name: Get Tag
+        id: tag
+        run: |
+          tag=$(echo ${{ github.ref }} | cut -dv -f2)
+          echo "::set-output name=tag::$tag"
+
+      - name: Build Target
+        run: |
+          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 \
+          go build -ldflags="-s -w" -o build/FPR-${{ steps.tag.outputs.tag }}.exe ./main
+
+      - name: Chmod for application
+        run: chmod u+x build/FPR-v${{ steps.tag.outputs.tag }}.exe
+
+      - name: Create Release
+        id: create-release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: foxmail-password-recovery-${{ steps.tag.outputs.tag }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Target
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create-release.outputs.upload_url }}
+          asset_path: build/FPR-${{ steps.tag.outputs.tag }}.exe
+          asset_name: FPR-${{ steps.tag.outputs.tag }}.exe
+          asset_content_type: application/octet-stream
