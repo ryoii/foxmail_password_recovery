@@ -12,6 +12,9 @@ import (
 
 func main() {
 	loadAll()
+
+	fmt.Println("Press Enter to exit...")
+	_, _ = fmt.Scanln()
 }
 
 func loadAll() {
@@ -26,7 +29,7 @@ func loadAll() {
 }
 
 func solveFromAccountDir(base string, account os.FileInfo) {
-	fmt.Printf("%v\t\t", account.Name())
+	fmt.Printf("%-40s", account.Name())
 	fileName := filepath.Join(base, account.Name(), "Accounts", "Account.rec0")
 	loadAllSingleFile(fileName)
 }
@@ -39,5 +42,5 @@ func loadAllSingleFile(fileName string) {
 
 	decoded := decrypt.PasswordInRec0(clientType, string(password))
 
-	fmt.Printf("%v\n", decoded)
+	fmt.Printf("%s\n", decoded)
 }

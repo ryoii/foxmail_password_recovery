@@ -1,7 +1,7 @@
 # Foxmail Password Recovery
 
-The suck foxmail save the password with a suck way locally. The program can load the password saved by foxmail.
-It's useful when you forgot your password.
+The suck foxmail save the passwords with a suck way locally. The program can load the passwords saved by foxmail.
+It's useful when you forget your password.
 
 ### Usage
 
