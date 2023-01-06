@@ -5,7 +5,6 @@ import (
 	"foxmail_password_recover/decrypt"
 	"foxmail_password_recover/io"
 	"foxmail_password_recover/registry"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 )
@@ -22,25 +21,27 @@ func loadAll() {
 	dir := filepath.Dir(location)
 
 	base := filepath.Join(dir, "Storage")
-	accounts, _ := ioutil.ReadDir(base)
+	accounts, _ := os.ReadDir(base)
 	for _, account := range accounts {
-		solveFromAccountDir(base, account)
+		info, err := account.Info()
+		if err != nil {
+			continue
+		}
+		solveFromAccountDir(base, info)
 	}
 }
 
 func solveFromAccountDir(base string, account os.FileInfo) {
-	fmt.Printf("%-40s", account.Name())
 	fileName := filepath.Join(base, account.Name(), "Accounts", "Account.rec0")
-	loadAllSingleFile(fileName)
+	password := loadAllSingleFile(fileName)
+	fmt.Printf("%-40s%s\n", account.Name(), password)
 }
 
-func loadAllSingleFile(fileName string) {
+func loadAllSingleFile(fileName string) string {
 	context := io.ReadFile(fileName)
 
 	clientType := io.GetClientType(context)
 	password := io.FindPassWord(context)
 
-	decoded := decrypt.PasswordInRec0(clientType, string(password))
-
-	fmt.Printf("%s\n", decoded)
+	return decrypt.PasswordInRec0(clientType, string(password))
 }

@@ -3,21 +3,14 @@ package io
 import (
 	"encoding/binary"
 	"foxmail_password_recover/decrypt"
-	"io/ioutil"
 	"os"
 )
 
 func ReadFile(path string) []byte {
-	file, err := os.Open(path)
+	content, err := os.ReadFile(path)
 	if err != nil {
 		panic(err)
 	}
-
-	defer func(file *os.File) {
-		_ = file.Close()
-	}(file)
-
-	content, err := ioutil.ReadAll(file)
 	return content
 }
 
@@ -31,17 +24,23 @@ func GetClientType(content []byte) decrypt.Type {
 	}
 }
 
+// FindPassWord aims to find the latest password saved in the content
 func FindPassWord(content []byte) []byte {
 	key := []byte("Password")
-	for i := 0; i < len(content)-len(key); i++ {
-		if bytesEq(key, content[i:i+8]) {
-			// skip "password" and an unknown int32
+	var latest []byte
+	for i := 1; i < len(content)-len(key); i++ {
+		// Find "Password" and exclude that like "SmtpPassword"
+		if content[i-1] == 0x00 && bytesEq(key, content[i:i+8]) {
+			// skip "Password" and an unknown int32
 			offset := i + len(key) + 4
 			passwordLen := int(binary.LittleEndian.Uint32(content[offset : offset+4]))
-			return content[offset+4 : offset+4+passwordLen]
+			latest = content[offset+4 : offset+4+passwordLen]
 		}
 	}
-	panic("can not find password in this file")
+	if latest == nil {
+		panic("can not find password in this file")
+	}
+	return latest
 }
 
 func bytesEq(a, b []byte) bool {
