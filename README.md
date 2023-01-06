@@ -14,4 +14,4 @@ Just run the Program
 It means the program cannot find the location that foxmail installed. You can manually tell the program the installation path of the foxmail.
 1. Find the location the foxmail installed.
 2. Drag and drop the *Storage* directory to this program.
-3. Or you can just drag and drop the *.rec0* file (locate in Storage/\<email\>/Accounts/Account.rec0) to this program for load a single account.
+3. Or you can just drag and drop the *.rec0* file (locate in Storage/\<email\>/Accounts/Account.rec0) to this program for loading a single account.
